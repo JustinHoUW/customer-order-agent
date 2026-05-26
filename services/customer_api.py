@@ -1,9 +1,9 @@
 """
-My service layer responsiblity for interacting with dummy customer FLASK API
+Service layer responsible for interacting with the dummy customer Flask API
 
 Responsibility:
 - Connect to customer order API endpoints
-- Retrieve raw unstructured
+- Retrieve raw unstructured customer order data
 - Handle API/network failures gracefully
 - Log request and response activity
 - Return normalized Python data structures for downstream processing
@@ -39,12 +39,12 @@ def fetch_orders(limit=None):
         params = {}
 
         # only include limit parameter if user provided one
-        # edge case for unnecessary query parameters
+        # avoids sending unnecessary query parameters
         if limit is not None:
             params["limit"] = limit
         
         # send GET request to Flask API endpoint
-        # params=param automatically convers:
+        # params=param automatically converts:
         # {"limit": 2}
         #
         # into:
@@ -84,7 +84,7 @@ def fetch_orders(limit=None):
 
         # we expect raw_orders to ALWAYS be a list
         # validate expected schema structure
-        if not isistance(raw_orders, list):
+        if not isinstance(raw_orders, list):
 
             logging.error(
                 "Unexpected API schema. raw_orders is not a list: %s",
