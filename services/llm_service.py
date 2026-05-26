@@ -22,6 +22,15 @@ from openai import OpenAI
 # this allows us to keep API keys out of source control
 load_dotenv()
 
+# retrieve OpenRouter API key from environment variables
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+
+# missing api key check
+
+if not OPENROUTER_API_KEY:
+    raise ValueError("OPENROUTER_API_KEY is missing. Please add it to your .env file.")
+
+# initialize OpenAI-compatible OpenRouter client
 client = OpenAI(
     api_key=os.getenv("OPENROUTER_API_KEY"),
     base_url="https://openrouter.ai/api/v1"
@@ -39,7 +48,7 @@ def build_extraction_prompt(raw_order_text):
     
     Returns:
         str:
-            Prompt send to the language model
+            Prompt sent to the language model
     """
     return f"""
 You are an information extraction system
@@ -52,7 +61,7 @@ Rules:
 - Return valid JSON only
 - Do not include markdown
 - Do not include explanations
-- The toal field must be a number, not a string
+- The total field must be a number, not a string
 - The items field must be a list of strings.
 
 Required JSON schema:
