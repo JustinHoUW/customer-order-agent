@@ -90,7 +90,6 @@ def run_agent():
     # - filter_orders_node
     result = run_order_agent(user_query)
 
-    # return clean JSON response back to frontend
     return jsonify(result)
 
 

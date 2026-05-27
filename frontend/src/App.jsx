@@ -7,7 +7,7 @@
 // - user typing query
 // - loading spinner
 // - backend JSON response
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // import CSS styling file for component styles/layout
 import "./App.css";
@@ -20,6 +20,16 @@ const DEFAULT_QUERY =
   "Show me all orders where the buyer was located in Ohio and total value was over 500.";
 
 
+const TYPEWRITER_TEXT =
+  "Show me all orders where the buyer was located in Ohio and total value was over 500.";
+
+const TYPING_SPEED = 45;
+const DELETING_SPEED = 25;
+const PAUSE_AFTER_TYPING = 1200;
+const PAUSE_AFTER_DELETING = 500;
+const MIN_DELETE_LENGTH = 20;
+
+
 // main React component
 //
 // responsible for:
@@ -29,11 +39,14 @@ const DEFAULT_QUERY =
 // - displaying structured JSON results
 function App() {
 
+  const [animatedPlaceholder, setAnimatedPlaceholder] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isInputFocused, setIsInputFocused] = useState(false);
   // stores current user query typed into textarea
   //
   // example:
   // "orders in ohio over 500"
-  const [query, setQuery] = useState(DEFAULT_QUERY);
+  const [query, setQuery] = useState("");
 
   // stores final backend JSON response
   //
@@ -56,6 +69,62 @@ function App() {
   // - network failure
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    if (isInputFocused || query.length > 0) {
+      return;
+    }
+  
+    const currentLength = animatedPlaceholder.length;
+  
+    let timeoutDelay = isDeleting ? DELETING_SPEED : TYPING_SPEED;
+  
+    if (!isDeleting && currentLength === TYPEWRITER_TEXT.length) {
+      timeoutDelay = PAUSE_AFTER_TYPING;
+    }
+  
+    if (isDeleting && currentLength === 0) {
+      timeoutDelay = PAUSE_AFTER_DELETING;
+    }
+  
+    const timer = setTimeout(() => {
+      if (!isDeleting) {
+        if (currentLength < TYPEWRITER_TEXT.length) {
+          setAnimatedPlaceholder(TYPEWRITER_TEXT.slice(0, currentLength + 1));
+        } else {
+          setIsDeleting(true);
+        }
+      } else {
+        if (currentLength > 0) {
+
+          // randomly decide how much text to keep
+          const randomStopPoint =
+            Math.floor(
+              Math.random() *
+              (TYPEWRITER_TEXT.length - MIN_DELETE_LENGTH)
+            ) + MIN_DELETE_LENGTH;
+        
+          // continue deleting until random stop point reached
+          if (currentLength > randomStopPoint) {
+        
+            setAnimatedPlaceholder(
+              TYPEWRITER_TEXT.slice(0, currentLength - 1)
+            );
+        
+          } else {
+        
+            // begin typing again from partial sentence
+            setIsDeleting(false);
+          }
+        
+        } else {
+        
+          setIsDeleting(false);
+        }
+      }
+    }, timeoutDelay);
+  
+    return () => clearTimeout(timer);
+  }, [animatedPlaceholder, isDeleting, isInputFocused, query]);
 
   // async function responsible for executing the customer order agent
   //
@@ -144,91 +213,74 @@ function App() {
 
 
   return (
-
-    // main page container
     <main className="app-container">
-
-      {/* centered UI card */}
-      <section className="card">
-
-        {/* small top label */}
-        <p className="eyebrow">
-          Customer Order Agent
-        </p>
-
-        {/* main title */}
-        <h1>
-          Search messy customer orders with a structured agent workflow
-        </h1>
-
-        {/* project description */}
+      <div className="top-banner">Customer Order AI Agent</div>
+  
+      <section className="hero">
+        <p className="eyebrow">Structured order intelligence</p>
+        <h1>Search Customer Orders</h1>
         <p className="description">
-
-          This interface sends a natural language request to a Flask backend,
-          runs the LangGraph workflow, parses unstructured order text, validates
-          the output, and returns filtered JSON results.
-
+          Enter a natural language request and run a structured agent workflow
+          that retrieves messy order records, validates the output, and returns
+          clean JSON results.
         </p>
-
-        {/* textarea label */}
+      </section>
+  
+      <section className="card">
         <label htmlFor="query">
-          Order query
-        </label>
+  Order query
+</label>
 
-        {/* multi-line text input */}
-        <textarea
-          id="query"
+<div className="textarea-wrapper">
 
-          // current textarea value
-          value={query}
+  {/* animated fake placeholder */}
+  {!query && !isInputFocused && (
 
-          // update query state when user types
-          onChange={(event) =>
-            setQuery(event.target.value)
-          }
+    <div className="animated-placeholder">
 
-          // textarea size
-          rows={5}
-        />
+      {animatedPlaceholder}
 
-        {/* execute workflow button */}
-        <button
+      <span className="cursor">
+        |
+      </span>
 
-          // run backend workflow when clicked
-          onClick={runAgent}
+    </div>
+  )}
 
-          // disable button while backend request running
-          disabled={loading}
-        >
+  <textarea
+    id="query"
 
-          {/* conditional rendering */}
-          {loading
-            ? "Running agent..."
-            : "Run Agent"}
+    value={query}
 
+    onChange={(event) =>
+      setQuery(event.target.value)
+    }
+
+    // hide animation while user focused textarea
+    onFocus={() =>
+      setIsInputFocused(true)
+    }
+
+    // allow animation again if textarea empty
+    onBlur={() =>
+      setIsInputFocused(false)
+    }
+
+    rows={5}
+  />
+
+</div>
+  
+        <button onClick={runAgent} disabled={loading}>
+          {loading ? "Running agent..." : "Run Agent"}
         </button>
-
-        {/* display frontend/backend error message */}
-        {error && (
-          <p className="error">
-            {error}
-          </p>
-        )}
-
-        {/* display backend JSON results if available */}
+  
+        {error && <p className="error">{error}</p>}
+  
         {result && (
-
           <section className="results">
-
-            <h2>
-              Final JSON Response
-            </h2>
-
-            {/* pretty-print JSON results */}
-            <pre>
-              {JSON.stringify(result, null, 2)}
-            </pre>
-
+            <h2>Final JSON Response</h2>
+            <pre>{JSON.stringify(result, null, 2)}</pre>
           </section>
         )}
       </section>
