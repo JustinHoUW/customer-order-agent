@@ -13,7 +13,7 @@ import logging
 
 # expected schema definition for structured orders
 REQUIRED_FIELDS = {
-    "orderID": str,
+    "orderId": str,
     "buyer": str,
     "city": str,
     "state": str,
@@ -31,11 +31,11 @@ def validate_order(order):
 
     Returns:
         dict | None:
-            Validated order if schema check pass
+            Validated order if schema checks pass
             None if validation fails
     """
 
-    # defensive validatoin
+    # defensive validation
     # ensure order is actually a dictionary
     if not isinstance(order, dict):
         
@@ -143,7 +143,7 @@ def validate_orders(orders):
     Validate multiple structured order objects and return only safe records
 
     Args:
-        order (list):
+        orders (list):
             List of structured order dictionaries
     
     Returns:

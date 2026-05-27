@@ -60,7 +60,7 @@ def extract_filters(user_query):
         # above 500
         if word in ["over", "above"]:
 
-            # ensure next token exists:
+            # ensure next token exists
             if index + 1 < len(words):
 
                 # extract number 
