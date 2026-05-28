@@ -4,7 +4,7 @@ A full-stack customer order processing system that takes natural language order 
 
 ## Demo
 
-![Customer Order AI Agent Demo](assets/customer_agent_demo.gif)
+![Customer Order AI Agent Demo](frontend/src/assets/customer_agent_demo.gif)
 
 ## What It Does
 
@@ -14,3 +14,4 @@ Example query:
 
 ```text
 Show me all orders where the buyer was located in Ohio and total value was over 500.
+```
