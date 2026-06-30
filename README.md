@@ -1,6 +1,6 @@
 # Customer Order AI Agent
 
-A full-stack customer order processing system that takes natural language order requests, retrieves messy unstructured order records from a dummy customer API, converts them into structured JSON using an LLM extraction pipeline, validates the output, and applies deterministic filtering logic to return clean customer order results.
+A full-stack customer order processing system that takes natural language order requests, retrieves order records from a customer API, converts them into structured JSON using an LLM extraction pipeline, validates the output, and applies deterministic filtering logic to return clean customer order results.
 
 ## Demo
 
